@@ -59,6 +59,7 @@ a value of $0 for the account, regardless of what is in it.)
 
 * ```--year``` the calendar year to use
 * ```--only-account``` Instead of listing all accounts, you can specify which accounts you care about.
+* ```--subaccount``` Specify the the top level name for an account that has subaccounts that will be summed and reported together. E.g., Supplying `Assets:Stocks` would aggregate subaccounts related to ticker symbols like `Assets:Stocks:Symbol1` `Assets:Stocks:Symbol2` `Assets:Stocks:Symbol3`. Can also be used if you divide a real bank account into theoretical categories.
 * ```--meta-account-number``` This is the metadata on the account opening directive that includes the account number. By default it will look for *account-number*
 
 [1]: https://bsaefiling.fincen.treas.gov/NoRegFBARFiler.html
