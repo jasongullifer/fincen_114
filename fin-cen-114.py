@@ -97,7 +97,6 @@ def filter_subaccounts(subaccts, accounts_sorted):
             else:
                 accounts_filtered.append(a)
     print()
-    print(subaccounts_sorted)
     return subaccounts_sorted, accounts_filtered
 
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
