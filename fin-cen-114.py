@@ -97,6 +97,7 @@ def filter_subaccounts(subaccts, accounts_sorted):
             else:
                 accounts_filtered.append(a)
     print()
+    print(subaccounts_sorted)
     return subaccounts_sorted, accounts_filtered
 
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
@@ -113,10 +114,10 @@ def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only
             # reportable.append((account, open, list(realized_accounts[account])))
             reportable.append((account, open, [p for p in realized_accounts[account] if only_postings(p)]))
 
-    if subaccounts:
-        streams=[]
+    if subaccounts:        
         for major_account, minor_accounts in subaccounts_sorted.items():
             postings = []
+            streams=[]
             last_open = None
             for account, (open, close) in minor_accounts:
                 if only_account and account not in only_account: 
