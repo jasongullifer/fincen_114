@@ -76,24 +76,24 @@ If the script is run normally, each subaccount is reported separately:
 
 ```
 >> python fin-cen-114.py --year 2024 example/example_subaccounts.bean 
-Account name                                      CAD             USD    Acct. number
-Assets:CA:Tangerine:Checking             $     10,000    $      7,500      CA-CHK-001
-Assets:CA:Wise:Main                      $          0    $          0         WISE-01
-Assets:CA:Wise:Main:Savings              $      5,000    $      3,750         WISE-01
-Assets:CA:Wise:Main:Travel               $      3,000    $      2,250         WISE-01
+Account name                                                     CAD             USD    Acct. number
+Assets:CA:Tangerine:Checking                            $          0    $          0      CA-CHK-001
+Assets:CA:Tangerine:Checking:Grocery                    $        500    $        375      CA-CHK-001
+Assets:CA:Tangerine:Checking:Main                       $        120    $         90      CA-CHK-001
+Assets:CA:Tangerine:Checking:Rent                       $      1,500    $      1,125      CA-CHK-001
+Assets:CA:Tangerine:Saving                              $          0    $          0    Tangerine-01
+Assets:CA:Tangerine:Saving:HomeImprovement              $      5,000    $      3,750    Tangerine-01
+Assets:CA:Tangerine:Saving:Main                         $      1,000    $        750    Tangerine-01
+Assets:CA:Tangerine:Saving:Travel                       $      3,000    $      2,250    Tangerine-01
 ```
 
 Using the --subaccount option tells the script to treat the specified account and all of its subaccounts as a single account, aggregating their balances.
 
 ```
->> python fin-cen-114.py --year 2024 --subaccount Assets:CA:Wise:Main example/example_subaccounts.bean 
-Found subaccount: Assets:CA:Wise:Main                               
-Found subaccount: Assets:CA:Wise:Main:Savings                       
-Found subaccount: Assets:CA:Wise:Main:Travel                        
-
-Account name                                      CAD             USD    Acct. number
-Assets:CA:Tangerine:Checking             $     10,000    $      7,500      CA-CHK-001
-Assets:CA:Wise:Main                      $      8,000    $      6,000         WISE-01
+>> python fin-cen-114.py --year 2024  --subaccount Assets:CA:Tangerine:Saving --subaccount Assets:CA:Tangerine:Checking example/example_subaccounts.bean
+Account name                                                     CAD             USD    Acct. number
+Assets:CA:Tangerine:Checking                            $      2,120    $      1,590      CA-CHK-001
+Assets:CA:Tangerine:Saving                              $      9,000    $      6,750    Tangerine-01
 ```
 
 In this case, the balances of the Savings and Travel subaccounts are combined, producing a total balance of 8,000 CAD (6,000 USD) for the underlying Wise account.
