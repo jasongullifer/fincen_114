@@ -16,35 +16,56 @@ option "operating_currency" "USD"
   institution: "Tangerine Bank"
   account-number: "CA-CHK-001"
 
-2024-01-10 * "Initial deposit"
-  Assets:CA:Tangerine:Checking   6000 CAD
+2015-01-01 open Assets:CA:Tangerine:Checking:Main CAD
+  institution: "Tangerine Bank"
+  account-number: "CA-CHK-001"
+
+2015-01-01 open Assets:CA:Tangerine:Checking:Grocery CAD
+  institution: "Tangerine Bank"
+  account-number: "CA-CHK-001"
+
+2015-01-01 open Assets:CA:Tangerine:Checking:Rent CAD
+  institution: "Tangerine Bank"
+  account-number: "CA-CHK-001"
+
+2024-07-01 * "Paycheck"
+  Assets:CA:Tangerine:Checking:Main       120 CAD
+  Assets:CA:Tangerine:Checking:Grocery    500 CAD
+  Assets:CA:Tangerine:Checking:Rent      1500 CAD
   Equity:Opening-Balances
 
-2024-07-01 * "More savings"
-  Assets:CA:Tangerine:Checking   4000 CAD
-  Equity:Opening-Balances
-
+2024-07-02 balance Assets:CA:Tangerine:Checking 2120 CAD
 
 ; ------------------------------------------------------------
-; Wise account split into subaccounts
+; Tangerine account split into subaccounts
 ; (represents one real bank account)
 ; ------------------------------------------------------------
-2018-01-01 open Assets:CA:Wise:Main CAD
-  institution: "Wise"
-  account-number: "WISE-01"
-  
-2018-01-01 open Assets:CA:Wise:Main:Travel CAD
-  institution: "Wise"
-  account-number: "WISE-01"
+2018-01-01 open Assets:CA:Tangerine:Saving CAD
+  institution: "Tangerine"
+  account-number: "Tangerine-01"
 
-2018-01-01 open Assets:CA:Wise:Main:Savings CAD
-  institution: "Wise"
-  account-number: "WISE-01"
+2018-01-01 open Assets:CA:Tangerine:Saving:Main CAD
+  institution: "Tangerine"
+  account-number: "Tangerine-01"
+  
+2018-01-01 open Assets:CA:Tangerine:Saving:Travel CAD
+  institution: "Tangerine"
+  account-number: "Tangerine-01"
+
+2018-01-01 open Assets:CA:Tangerine:Saving:HomeImprovement CAD
+  institution: "Tangerine"
+  account-number: "Tangerine-01"
+
+2024-01-02 * "Saving"
+  Assets:CA:Tangerine:Saving:Main   1000 CAD
+  Equity:Opening-Balances
 
 2024-03-01 * "Travel fund"
-  Assets:CA:Wise:Main:Travel   3000 CAD
+  Assets:CA:Tangerine:Saving:Travel   3000 CAD
   Equity:Opening-Balances
 
-2024-05-01 * "Savings allocation"
-  Assets:CA:Wise:Main:Savings  5000 CAD
+2024-05-01 * "Home improvement allocation"
+  Assets:CA:Tangerine:Saving:HomeImprovement  5000 CAD
   Equity:Opening-Balances
+
+2024-05-02 balance Assets:CA:Tangerine:Saving 9000 CAD
