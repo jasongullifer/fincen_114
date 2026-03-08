@@ -102,7 +102,7 @@ def filter_subaccounts(subaccts, accounts_sorted):
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
     if subaccounts:
         subaccounts_sorted, accounts_sorted = filter_subaccounts(subaccounts, accounts_sorted)
-
+    print(len(subaccounts_sorted))
     reportable = []
     for account, (open, close) in accounts_sorted:
         if only_account and account not in only_account: 
