@@ -81,28 +81,43 @@ def get_account_number(account, keys):
 def fmt_d(n):
     return '${:,.0f}'.format(n)
 
-def filter_subaccounts(subaccts, accounts_sorted):
-    subaccounts_sorted = {}    
-    accounts_filtered = []
+def get_parent(account):
+    if ":" in account:
+        return account.rsplit(":", 1)[0]             
+    return None
 
-    for major_account_name in subaccts:
-        for ix, a in enumerate(accounts_sorted):
-            minor_account_name = a[0]
-            if major_account_name in minor_account_name:
-                if major_account_name not in subaccounts_sorted:
-                    subaccounts_sorted[major_account_name] = [a]                    
-                else:
-                    subaccounts_sorted[major_account_name].append(a)
-                print(f"Found subaccount: {minor_account_name:<50s}")
-            else:
-                accounts_filtered.append(a)
-    print()
+def filter_subaccounts(subaccts, accounts_sorted):
+    subaccts = set(subaccts)              # O(1) lookups
+    subaccounts_sorted = {m: [] for m in subaccts}
+    accounts_filtered = []
+    majors_with_children = set()
+
+    for account, (open_, close_) in accounts_sorted:
+        # Find nearest parent
+        parent = get_parent(account)
+
+        if parent and parent in subaccts:
+            subaccounts_sorted[parent].append((account, (open_, close_)))
+            majors_with_children.add(parent)
+        else:
+            accounts_filtered.append((account, (open_, close_)))
+
+    # Remove empty major buckets
+    new = {}
+    for m, children in subaccounts_sorted.items():
+        if children:
+            new[m] = children
+    subaccounts_sorted = new
+
+    # Remove parent accounts from standalone list
+    accounts_filtered = [a for a in accounts_filtered if a[0] not in majors_with_children]
+
     return subaccounts_sorted, accounts_filtered
 
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
     if subaccounts:
         subaccounts_sorted, accounts_sorted = filter_subaccounts(subaccounts, accounts_sorted)
-    print(len(subaccounts_sorted))
+
     reportable = []
     for account, (open, close) in accounts_sorted:
         if only_account and account not in only_account: 
