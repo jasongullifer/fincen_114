@@ -163,7 +163,7 @@ def find_daily_max(year, postings, price_map):
 
 def get_cli_args():
     parser = argparse.ArgumentParser(
-        description="Summarise account information for FinCEF 114 filing."
+        description="Summarise account information for FinCEN 114 filing."
     )
     parser.add_argument('bean', help='Path to the beancount file.')
     parser.add_argument('--year', type=int, help='Which year to summarise.', required=True)
@@ -208,4 +208,4 @@ if __name__ == '__main__':
         print(f"{display_name:50s}\t${(max_value_cad):11,.0f}\t${(max_value):11,.0f}\t{account_number:>12}")
 
     df = pd.DataFrame(rows)
-    df.to_csv("summary.csv", index=False)#!/usr/bin/env python
+    df.to_csv("summary.csv", index=False)
