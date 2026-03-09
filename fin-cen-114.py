@@ -63,7 +63,6 @@ def iter_year(year, account_postings, inventory, price_map):
     filter_year = functools.partial(this_year, year)
 
     postings = account_postings
-    # postings = sorted(filter(only_postings, account_postings), key=get_date)
     postings = filter(filter_year, iter(postings))
     txn = next(postings, None)
     for date in iter_dates(start_of_year, end_of_year):
@@ -92,15 +91,15 @@ def filter_subaccounts(subaccts, accounts_sorted):
     accounts_filtered = []
     majors_with_children = set()
 
-    for account, (open_, close_) in accounts_sorted:
+    for account, (open_directive, close_directive) in accounts_sorted:
         # Find nearest parent
         parent = get_parent(account)
 
         if parent and parent in subaccts:
-            subaccounts_sorted[parent].append((account, (open_, close_)))
+            subaccounts_sorted[parent].append((account, (open_directive, close_directive)))
             majors_with_children.add(parent)
         else:
-            accounts_filtered.append((account, (open_, close_)))
+            accounts_filtered.append((account, (open_directive, close_directive)))
 
     # Remove empty major buckets
     new = {}
@@ -125,7 +124,6 @@ def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only
         open_year = open_directive.date.year if open_directive else -math.inf
         close_year = close_directive.date.year if close_directive else math.inf
         if open_year <= year <= close_year:
-            # reportable.append((account, open_directive, list(realized_accounts[account])))
             reportable.append((account, open_directive, [p for p in realized_accounts[account] if only_postings(p)]))
 
     if subaccounts:        
