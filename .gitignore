@@ -1,1 +1,15 @@
+# Output
 *.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# uv
+.python-version
