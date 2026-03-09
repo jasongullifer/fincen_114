@@ -27,12 +27,7 @@ def get_date(p):
         raise Exception("Not a Posting or TxnPosting", p)
 
 def only_postings(p):
-    if isinstance(p, beancount.core.data.Posting):
-        return True
-    elif isinstance(p, beancount.core.data.TxnPosting):
-        return True
-    else:
-        return False
+    return isinstance(p, (beancount.core.data.Posting, beancount.core.data.TxnPosting))
         
 def this_year(year, p):
     return get_date(p).year == year
