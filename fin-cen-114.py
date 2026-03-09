@@ -155,11 +155,11 @@ def find_daily_max(year, postings, price_map):
     for date, balance_usd, balance_cad in iter_year(year, postings, inventory, price_map):
         usd_value = balance_usd.get_currency_units('USD')
         cad_value = balance_cad.get_currency_units('CAD')
-        if int(usd_value.number) > max_value:
-            max_value = int(usd_value.number)
-            max_value_cad = int(cad_value.number)
+        if usd_value.number > max_value:
+            max_value = usd_value.number
+            max_value_cad = cad_value.number
             max_value_date = date
-    return max_value, max_value_cad, max_value_date
+    return int(max_value), int(max_value_cad), max_value_date
 
 def get_cli_args():
     parser = argparse.ArgumentParser(
