@@ -68,12 +68,14 @@ def iter_year(year, account_postings, inventory, price_map):
 
 def get_account_number(account, keys):
     for k in keys:
-        if k in account.meta.keys():
+        if k in account.meta:
             return account.meta[k]
     return ''
 
-def fmt_d(n):
-    return '${:,.0f}'.format(n)
+def account_active_in(open_directive, close_directive, year):
+    open_year = open_directive.date.year if open_directive else -math.inf
+    close_year = close_directive.date.year if close_directive else math.inf
+    return open_year <= year <= close_year
 
 def get_parent(account):
     if ":" in account:
@@ -97,11 +99,7 @@ def filter_subaccounts(subaccts, accounts_sorted):
             accounts_filtered.append((account, (open_directive, close_directive)))
 
     # Remove empty major buckets
-    new = {}
-    for m, children in subaccounts_sorted.items():
-        if children:
-            new[m] = children
-    subaccounts_sorted = new
+    subaccounts_sorted = {m: children for m, children in subaccounts_sorted.items() if children}
 
     # Remove parent accounts from standalone list
     accounts_filtered = [a for a in accounts_filtered if a[0] not in majors_with_children]
@@ -110,28 +108,26 @@ def filter_subaccounts(subaccts, accounts_sorted):
 
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
     if subaccounts:
-        subaccounts_sorted, accounts_sorted = filter_subaccounts(subaccounts, accounts_sorted)
+        subaccounts_sorted, standalone_accounts = filter_subaccounts(subaccounts, accounts_sorted)
+    else:
+        standalone_accounts = accounts_sorted
 
     reportable = []
-    for account, (open_directive, close_directive) in accounts_sorted:
+    for account, (open_directive, close_directive) in standalone_accounts:
         if only_account and account not in only_account:
             continue
-        open_year = open_directive.date.year if open_directive else -math.inf
-        close_year = close_directive.date.year if close_directive else math.inf
-        if open_year <= year <= close_year:
+        if account_active_in(open_directive, close_directive, year):
             reportable.append((account, open_directive, [p for p in realized_accounts[account] if only_postings(p)]))
 
     if subaccounts:        
         for major_account, minor_accounts in subaccounts_sorted.items():
             postings = []
-            streams=[]
+            streams = []
             last_open = None
             for account, (open_directive, close_directive) in minor_accounts:
                 if only_account and account not in only_account:
                     continue
-                open_year = open_directive.date.year if open_directive else -math.inf
-                close_year = close_directive.date.year if close_directive else math.inf
-                if open_year <= year <= close_year:
+                if account_active_in(open_directive, close_directive, year):
                     streams.append([p for p in realized_accounts[account] if only_postings(p)])
                     last_open = open_directive
             postings = list(heapq.merge(*streams, key=get_date))
