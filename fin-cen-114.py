@@ -19,6 +19,7 @@ from beancount.core.amount import Amount, add
 import pandas as pd
 
 def get_date(p):
+    """Return the date of a Posting or TxnPosting."""
     if isinstance(p, beancount.core.data.Posting):
         return p.date
     elif isinstance(p, beancount.core.data.TxnPosting):
@@ -27,12 +28,15 @@ def get_date(p):
         raise Exception("Not a Posting or TxnPosting", p)
 
 def only_postings(p):
+    """Return True if p is a Posting or TxnPosting (filters out balance/pad entries)."""
     return isinstance(p, (beancount.core.data.Posting, beancount.core.data.TxnPosting))
         
 def this_year(year, p):
+    """Return True if the posting's date falls within the given year."""
     return get_date(p).year == year
 
 def add_position(p, inventory):
+    """Add a Posting or TxnPosting to the given Inventory."""
     if isinstance(p, beancount.core.data.Posting):
         inventory.add_position(p)
     elif isinstance(p, beancount.core.data.TxnPosting):
@@ -41,6 +45,7 @@ def add_position(p, inventory):
         raise Exception("Not a Posting or TxnPosting", p)
 
 def start_of_year_inventory(year, postings):
+    """Build an Inventory from all postings strictly before the given year."""
     balance = beancount.core.inventory.Inventory()
     for p in filter(only_postings, postings):
         if get_date(p).year < year:
@@ -48,6 +53,12 @@ def start_of_year_inventory(year, postings):
     return balance
 
 def iter_year(year, account_postings, inventory, price_map):
+    """Iterate over every date in the year, yielding (date, usd_balance, cad_balance).
+
+    Applies postings in chronological order, converting the running inventory to
+    USD and CAD at each date using price_map. inventory should be pre-seeded with
+    the carry-in balance from before the year starts.
+    """
     assert all(
         get_date(a) <= get_date(b)
         for a, b in zip(account_postings, account_postings[1:])
@@ -67,22 +78,32 @@ def iter_year(year, account_postings, inventory, price_map):
         yield date, inventory.reduce(beancount.core.convert.convert_position, 'USD', price_map, date), inventory.reduce(beancount.core.convert.convert_position, 'CAD', price_map, date)
 
 def get_account_number(account, keys):
+    """Return the first metadata value found for any of the given keys, or '' if none match."""
     for k in keys:
         if k in account.meta:
             return account.meta[k]
     return ''
 
 def account_active_in(open_directive, close_directive, year):
+    """Return True if the account was open at any point during the given year."""
     open_year = open_directive.date.year if open_directive else -math.inf
     close_year = close_directive.date.year if close_directive else math.inf
     return open_year <= year <= close_year
 
 def get_parent(account):
+    """Return the immediate parent account name, or None if account has no parent."""
     if ":" in account:
         return account.rsplit(":", 1)[0]             
     return None
 
 def filter_subaccounts(subaccts, accounts_sorted):
+    """Separate direct children of subacct parents from the standalone account list.
+
+    Returns (subaccounts_sorted, standalone_accounts) where:
+      - subaccounts_sorted: dict mapping each parent in subaccts to its direct children
+      - standalone_accounts: accounts that are not direct children of any subacct parent,
+        with parent accounts that have children removed
+    """
     subaccts = set(subaccts)              # O(1) lookups
     subaccounts_sorted = {m: [] for m in subaccts}
     accounts_filtered = []
@@ -107,6 +128,12 @@ def filter_subaccounts(subaccts, accounts_sorted):
     return subaccounts_sorted, accounts_filtered
 
 def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only_account=None):
+    """Build the list of (display_name, open_directive, postings) tuples to report.
+
+    Standalone accounts are included as-is. Accounts whose parent is listed in
+    subaccounts have their postings merged under the parent name. Accounts not
+    active in year (per account_active_in) are excluded.
+    """
     if subaccounts:
         subaccounts_sorted, standalone_accounts = filter_subaccounts(subaccounts, accounts_sorted)
     else:
@@ -137,6 +164,7 @@ def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only
     return reportable
 
 def find_daily_max(year, postings, price_map):
+    """Return (max_usd, max_cad, date) for the peak USD balance during the year."""
     inventory = start_of_year_inventory(year, postings)
     max_value_date = None
     max_value = 0
@@ -151,6 +179,7 @@ def find_daily_max(year, postings, price_map):
     return int(max_value), int(max_value_cad), max_value_date
 
 def get_cli_args():
+    """Parse and return command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Summarise account information for FinCEN 114 filing."
     )
