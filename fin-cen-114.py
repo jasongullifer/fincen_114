@@ -119,28 +119,28 @@ def build_reportable(accounts_sorted, subaccounts, realized_accounts, year, only
         subaccounts_sorted, accounts_sorted = filter_subaccounts(subaccounts, accounts_sorted)
 
     reportable = []
-    for account, (open, close) in accounts_sorted:
-        if only_account and account not in only_account: 
+    for account, (open_directive, close_directive) in accounts_sorted:
+        if only_account and account not in only_account:
             continue
-        open_year = open.date.year if open else -math.inf
-        close_year = close.date.year if close else math.inf
+        open_year = open_directive.date.year if open_directive else -math.inf
+        close_year = close_directive.date.year if close_directive else math.inf
         if open_year <= year <= close_year:
-            # reportable.append((account, open, list(realized_accounts[account])))
-            reportable.append((account, open, [p for p in realized_accounts[account] if only_postings(p)]))
+            # reportable.append((account, open_directive, list(realized_accounts[account])))
+            reportable.append((account, open_directive, [p for p in realized_accounts[account] if only_postings(p)]))
 
     if subaccounts:        
         for major_account, minor_accounts in subaccounts_sorted.items():
             postings = []
             streams=[]
             last_open = None
-            for account, (open, close) in minor_accounts:
-                if only_account and account not in only_account: 
+            for account, (open_directive, close_directive) in minor_accounts:
+                if only_account and account not in only_account:
                     continue
-                open_year = open.date.year if open else -math.inf
-                close_year = close.date.year if close else math.inf
+                open_year = open_directive.date.year if open_directive else -math.inf
+                close_year = close_directive.date.year if close_directive else math.inf
                 if open_year <= year <= close_year:
                     streams.append([p for p in realized_accounts[account] if only_postings(p)])
-                    last_open = open
+                    last_open = open_directive
             postings = list(heapq.merge(*streams, key=get_date))
             if postings:
                 reportable.append((major_account, last_open, postings))
